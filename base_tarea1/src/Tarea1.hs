@@ -41,6 +41,7 @@ productoParesRec (x:xs)
 -- intenta convertirla a un número entero (Int). Si la conversión es exitosa,
 -- devuelve Right Int. Si la conversión falla (porque la cadena no es puramente
 -- numérica), devuelve Left String con la cadena original transformada a mayúsculas.
+-- Nota: Necesitarás funciones auxiliares para el parseo seguro y la conversión a mayúsculas.
 parsearCondicional :: [String] -> [Either String Int]
 parsearCondicional = map decidir
   where
