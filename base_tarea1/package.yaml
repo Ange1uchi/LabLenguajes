@@ -1,0 +1,27 @@
+name: tarea1
+version: 0.1.0.0
+synopsis: Tarea 1 - Haskell SOS
+category: Education
+author: Your Name
+maintainer: your@email.com
+license: MIT
+extra-source-files: []
+description: |
+  Proyecto de ejemplo para Tarea 1 en Haskell.
+dependencies:
+- base >= 4.7 && < 5
+- HUnit
+library:
+  source-dirs: src
+executables:
+  tarea1-exe:
+    main: Main.hs
+    source-dirs: src
+    ghc-options: -Wall
+tests:
+  tarea1-test:
+    main: Test.hs
+    source-dirs: test
+    dependencies:
+      - tarea1
+      - HUnit
