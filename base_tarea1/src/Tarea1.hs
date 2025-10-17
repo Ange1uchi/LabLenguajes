@@ -5,7 +5,8 @@ module Tarea1 where
 -- Carnet: [INSERTE SU CARNET AQUÍ]
 -------------------------------------------------------------------------------
 
-import Data.Char (isDigit, toUpper)
+import Data.Char (toUpper)
+import Text.Read (readMaybe)
 
 -------------------------------------------------------------------------------
 -- Problema 1: Palíndromo
@@ -45,9 +46,10 @@ productoParesRec (x:xs)
 parsearCondicional :: [String] -> [Either String Int]
 parsearCondicional = map decidir
   where
-    decidir str
-      | not (null str) && all isDigit str = Right (read str)
-      | otherwise                         = Left (map toUpper str)
+    decidir str =
+      case (readMaybe str :: Maybe Int) of
+        Just n  -> Right n
+        Nothing -> Left (map toUpper str)
 
 -------------------------------------------------------------------------------
 -- Problema 4: Suma Acumulada Condicional
