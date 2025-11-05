@@ -1,0 +1,16 @@
+# Carpetas de build
+.stack-work/
+dist/
+dist-newstyle/
+
+# Archivos temporales
+*.hi
+*.o
+*.exe
+
+# Archivos de Stack
+stack.yaml.lock
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
