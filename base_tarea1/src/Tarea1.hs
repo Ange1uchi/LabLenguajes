@@ -1,4 +1,10 @@
 module Tarea1 where
+-------------------------------------------------------------------------------
+-- Tarea 1 - Laboratorio de Lenguajes de Programación I (CI-3661)
+-- Nombre del estudiante: [Angel Valero]
+-- Carnet: [18-10436]
+-------------------------------------------------------------------------------
+
 import Data.Char (toUpper)
 import Text.Read (readMaybe)
 
