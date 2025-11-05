@@ -1,0 +1,35 @@
+module Engine.Types where
+
+import qualified Data.Map as Map
+
+type RoomName = String
+type ItemName = String
+
+data Direction = Norte | Sur | Este | Oeste
+    deriving (Show, Eq, Ord)
+
+data Command
+    = Ir Direction
+    | Mirar
+    | Tomar ItemName
+    | Inventario
+    | Salir
+    deriving (Show, Eq)
+
+data Item = Item
+    { itemName :: ItemName
+    , itemDesc :: String
+    } deriving (Show)
+
+data Room = Room
+    { roomName :: RoomName
+    , roomDesc :: String
+    , exits :: Map.Map Direction RoomName
+    , items :: [ItemName]
+    } deriving (Show)
+
+data GameState = GameState
+    { currentRoom :: RoomName
+    , inventory :: Map.Map ItemName Item
+    , world :: Map.Map RoomName Room
+    } deriving (Show)
