@@ -13,6 +13,8 @@ data Command
     | Mirar
     | Tomar ItemName
     | Inventario
+    | Desc ItemName
+    | Buscar 
     | Salir
     deriving (Show, Eq)
 
@@ -32,4 +34,5 @@ data GameState = GameState
     { currentRoom :: RoomName
     , inventory :: Map.Map ItemName Item
     , world :: Map.Map RoomName Room
+    , itemDatabase :: Map.Map ItemName Item 
     } deriving (Show)
