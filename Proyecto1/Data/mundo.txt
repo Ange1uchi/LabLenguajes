@@ -1,18 +1,44 @@
-ITEM: llaves
-DESC: Unas llaves brillantes.
+ITEM: cable
+DESC: Un cable de red trenzado, parece resistente.
 
 ---
-ITEM: cuchillo
-DESC: Un cuchillo afilado.
+ITEM: llave_maestra
+DESC: Una antigua llave de bronce. Tiene el número '5' grabado.
+
+---
+ITEM: nota
+DESC: Una nota arrugada dice: "La solución está en la primera cosa que tomaste."
 
 ---
 SALA: Sala de Estar
-DESC: Una acogedora sala de estar. Hay una puerta al norte.
-SALIDA: Norte -> Cocina
-OBJETO: llaves
+DESC: Estás en la sala de estar. Es acogedora, pero todas las ventanas están selladas.
+SALIDA: Norte -> Pasillo Central
+OBJETO: cable
 
 ---
-SALA: Cocina
-DESC: Una cocina desordenada. Hay una puerta al sur.
+SALA: Pasillo Central
+DESC: Un pasillo estrecho con puertas al Este y Oeste. La pared Norte tiene un panel de códigos.
+SALIDA: Este -> Taller
+SALIDA: Oeste -> Bodega
 SALIDA: Sur -> Sala de Estar
-OBJETO: cuchillo
+
+---
+SALA: Taller
+DESC: Este es un taller desordenado lleno de herramientas. Hay un hueco en la pared que parece contener algo.
+SALIDA: Oeste -> Pasillo Central
+OBJETO: nota
+
+---
+SALA: Bodega
+DESC: Una bodega fría y oscura. Encuentras un cofre pesado.
+SALIDA: Este -> Pasillo Central
+OBJETO: llave_maestra
+
+---
+SALA: Salida Final
+DESC: ¡Has escapado! Estás en la calle.
+
+---
+SALA: Cuarto de la Salida
+DESC: Una habitación pequeña con una única puerta metálica y muy pesada que da al exterior. La puerta tiene una cerradura digital.
+SALIDA: Sur -> Pasillo Central

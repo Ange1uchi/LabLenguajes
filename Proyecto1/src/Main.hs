@@ -20,6 +20,7 @@ availableCommands = unlines
     , "  - ir <direccion> (ej: ir norte)"
     , "  - tomar <objeto> (alias: coger)"
     , "  - desc <objeto>"
+    , "  - usar <objeto>" 
     , "  - buscar"
     , "  - mirar"
     , "  - inventario (alias: inv)"
@@ -30,7 +31,14 @@ availableCommands = unlines
 main :: IO ()
 main = do
     -- Mensaje inicial mientras se carga el mundo desde el archivo
-    putStrLn "Cargando mundo..."
+    putStrLn "Despertando..."
+    putStrLn ("Acabas de despertar en la sala de estar de un apartamento que reconoces, \n" ++
+          "pero algo ha cambiado: todas las ventanas están selladas y las puertas, bloqueadas. \n" ++
+          "Anoche, durante una \"conversación\" particularmente intensa sobre el futuro de la relación, \n" ++
+          "tu ex pareja, la brillante y un poco obsesiva Dra. ALexa, decidió que la mejor manera de resolver vuestros problemas era... \n" ++
+          "dándote un tiempo a solas. Te ha encerrado en su peculiar \"centro de desintoxicación emocional\" y,\n" ++
+          "la única forma de escapar es resolviendo los puzzles que dejó."
+         )
     -- Intento cargar los datos del mundo desde el archivo data/mundo.txt
     result <- loadWorldData "Data/mundo.txt"
     case result of
@@ -48,7 +56,7 @@ main = do
                                          , world = rooms
                                          , itemDatabase = itemsDB
                                          }
-            putStrLn "¡Bienvenido al juego de aventura!"
+            putStrLn "Lévantate y escapa si puedes..."
 
             putStrLn availableCommands
             putStrLn ""

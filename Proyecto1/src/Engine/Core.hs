@@ -85,6 +85,39 @@ processCommand (Desc itemName) state =
                 Item { itemName = name, itemDesc = desc } = item 
             in ("**" ++ name ++ "**: " ++ desc, state)
 
+-- 'Usar itemName' intenta usar un objeto del inventario.
+processCommand (Usar itemName) state
+    -- Verificar si el jugador tiene el objeto
+    | Map.notMember itemName (inventory state) =
+        ("No tienes " ++ itemName ++ " en tu inventario.", state)
+
+    -- Lógica del Puzle (Debe ocurrir en Cuarto de la Salida)
+    | currentRoom state == "Cuarto de la Salida" =
+        case itemName of
+            "llave_maestra" ->
+                -- Si usa la llave maestra en la sala de salida
+                case Map.lookup "Cuarto de la Salida" (world state) of
+                    Nothing -> ("Error interno: Sala de Salida no encontrada.", state)
+                    Just exitRoom ->
+                        -- Define la nueva salida (Salida Final)
+                        let newExits = Map.insert Norte "Salida Final" (exits exitRoom)
+                            newExitRoom = exitRoom { roomDesc = "La puerta está desbloqueada.", exits = newExits }
+                            newWorld = Map.insert "Cuarto de la Salida" newExitRoom (world state)
+                            newState = state { world = newWorld }
+                        in ("¡Felicidades! La llave maestra encaja en la cerradura y la puerta se abre.\nAhora puedes ir al Norte.", newState)
+
+            "cable" ->
+                -- Objeto incorrecto
+                ("El cable no tiene utilidad aquí.", state)
+
+            -- Cualquier otro objeto que no resuelva el puzle
+            _ ->
+                ("No sabes cómo usar " ++ itemName ++ " en esta sala.", state)
+
+    -- Lógica General (Usar en cualquier otra sala)
+    | otherwise =
+        ("No hay nada en esta sala en lo que puedas usar " ++ itemName ++ ".", state)
+
 -- 'Salir' termina el juego (aquí solo devolvemos el estado sin cambios).
 processCommand Salir state = ("", state)
 

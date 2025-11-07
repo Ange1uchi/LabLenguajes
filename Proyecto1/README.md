@@ -52,7 +52,7 @@ Proyecto1/
 
 Este proyecto se gestiona con **Stack**. Se debe de tener Stack instalado.
 
-### Pasos para Compilar y Ejecutar
+### Pasos para Compilar y Ejecutar (Linux)
 
  **Compilar y construir:**
     En la raíz del proyecto (donde está el archivo `.cabal`):
@@ -70,6 +70,10 @@ El juego se iniciará cargando el mundo desde `data/mundo.txt` y entrará en el 
 ## Descripción y Justificación del Diseño
 
 Este proyecto consiste en el desarrollo de un **motor de aventura de texto** implementado en **Haskell**, cuyo objetivo principal es crear un sistema **modular, puro y reutilizable**.El motor cumple con el requisito de estar **desacoplado del contenido** , ya que carga la definición completa del mundo (salas, objetos, salidas) desde el archivo `data/mundo.txt`.
+
+## Archivo mundo.txt
+
+El archivo mundo.txt implementa un pequeño "Escape Room" con un puzle de salida, demostrando la capacidad del motor para manejar salidas condicionales mediante el comando usar teniendo como objetivo desbloquear la puerta del Cuarto de la Salida para llegar a la Salida Final.
 
 ### Estructura del Proyecto y Separación de I/O
 El diseño del proyecto se basa en la estricta **separación entre la lógica pura y los efectos de borde (I/O)**.
@@ -100,10 +104,16 @@ El motor soporta los siguientes comandos en español:
 
 * `ir <direccion>` (ej. `ir norte`): Mueve al jugador si la salida existe.
 * `mirar`: Vuelve a imprimir la descripción de la sala actual.
+* `desc <objeto>`: Describe el objeto desde el inventario.
+* `usar <objeto>`: se usa el objeto de la sala en cuestion. 
+* `buscar`: te muestra los objetos que te encuentras en la sala.
 * `tomar <objeto>` o `coger <objeto>`: Mueve el objeto de la sala al inventario del jugador.
 * `inventario` o `inv`: Muestra el contenido del inventario del jugador.
 * `salir`: Termina la ejecución del juego.
 
+
+
+## Desde WSL se ejecuta de la siguiente forma
 ```bash
 stack build
 stack run

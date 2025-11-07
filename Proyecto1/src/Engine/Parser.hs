@@ -15,6 +15,7 @@ parseCommand input =
         ["salir"]       -> Just Salir
         ["tomar", obj]  -> Just (Tomar obj)
         ["coger", obj]  -> Just (Tomar obj)
-        ["desc", obj]   -> Just (Desc obj)    
+        ["desc", obj]   -> Just (Desc obj)  
+        ["usar", obj]   -> Just (Usar obj)  
         ["buscar"]      -> Just Buscar
         _               -> Nothing

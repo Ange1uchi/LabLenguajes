@@ -16,6 +16,7 @@ data Command
     | Desc ItemName
     | Buscar 
     | Salir
+    | Usar ItemName
     deriving (Show, Eq)
 
 data Item = Item
