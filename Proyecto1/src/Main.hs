@@ -32,13 +32,11 @@ main :: IO ()
 main = do
     -- Mensaje inicial mientras se carga el mundo desde el archivo
     putStrLn "Despertando..."
-    putStrLn ("Acabas de despertar en la sala de estar de un apartamento que reconoces, \n" ++
-          "pero algo ha cambiado: todas las ventanas están selladas y las puertas, bloqueadas. \n" ++
-          "Anoche, durante una \"conversación\" particularmente intensa sobre el futuro de la relación, \n" ++
-          "tu ex pareja, la brillante y un poco obsesiva Dra. ALexa, decidió que la mejor manera de resolver vuestros problemas era... \n" ++
-          "dándote un tiempo a solas. Te ha encerrado en su peculiar \"centro de desintoxicación emocional\" y,\n" ++
-          "la única forma de escapar es resolviendo los puzzles que dejó."
-         )
+    putStrLn ("Te despiertas en la sala de estar de un apartamento que conoces, \n" ++
+          "pero todo parece salido de una feria: guirnaldas, pistas pegadas por todas partes y un robot que aplaude. \n" ++
+          "Tu ex, la brillante y algo excéntrica Dra. Alexa, decidió que la mejor forma de arreglar las cosas era organizarte una \"experiencia inmersiva\": \n" ++
+          "su particular \"centro de desintoxicación emocional\" convertido en un extravagante escape room lleno de acertijos, chistes malos y premios cuestionables. \n" ++
+          "Si quieres salir de este espectáculo doméstico tendrás que resolver sus puzzles... y, con suerte, llevarte la mejor recompensa: ¡la paz mental!")
     -- Intento cargar los datos del mundo desde el archivo data/mundo.txt
     result <- loadWorldData "Data/mundo.txt"
     case result of

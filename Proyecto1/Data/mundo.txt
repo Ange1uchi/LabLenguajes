@@ -3,21 +3,21 @@ DESC: Un cable de red trenzado, parece resistente.
 
 ---
 ITEM: llave_maestra
-DESC: Una antigua llave de bronce. Tiene el número '5' grabado.
+DESC: Una antigua llave de bronce. Tiene el numero '5' grabado.
 
 ---
 ITEM: nota
-DESC: Una nota arrugada dice: "La solución está en la primera cosa que tomaste."
+DESC: Una nota arrugada dice: "La solucion esta en la primera cosa que tomaste."
 
 ---
 SALA: Sala de Estar
-DESC: Estás en la sala de estar. Es acogedora, pero todas las ventanas están selladas.
+DESC: Estas en la sala de estar. Es acogedora, pero todas las ventanas estan selladas.
 SALIDA: Norte -> Pasillo Central
 OBJETO: cable
 
 ---
 SALA: Pasillo Central
-DESC: Un pasillo estrecho con puertas al Este y Oeste. La pared Norte tiene un panel de códigos.
+DESC: Un pasillo estrecho con puertas al Este y Oeste. La pared Norte tiene un panel de codigos.
 SALIDA: Este -> Taller
 SALIDA: Oeste -> Bodega
 SALIDA: Sur -> Sala de Estar
@@ -30,15 +30,15 @@ OBJETO: nota
 
 ---
 SALA: Bodega
-DESC: Una bodega fría y oscura. Encuentras un cofre pesado.
+DESC: Una bodega fria y oscura. Encuentras un cofre pesado.
 SALIDA: Este -> Pasillo Central
 OBJETO: llave_maestra
 
 ---
 SALA: Salida Final
-DESC: ¡Has escapado! Estás en la calle.
+DESC: ¡Has escapado! Estas en la calle.
 
 ---
 SALA: Cuarto de la Salida
-DESC: Una habitación pequeña con una única puerta metálica y muy pesada que da al exterior. La puerta tiene una cerradura digital.
+DESC: Una habitación pequeña con una unica puerta metalica y muy pesada que da al exterior. La puerta tiene una cerradura digital.
 SALIDA: Sur -> Pasillo Central
