@@ -7,7 +7,7 @@ DESC: Una antigua llave de bronce.
 
 ---
 ITEM: nota
-DESC: Una nota arrugada dice: "Lista de compras:Te de manzanilla, Eucalipt, Oso blanco (detergente), Doritos, Iselitas de platano con limon, cable del panel, Oreo. (Lee las mayusculas desde arriba hacia abajo)"
+DESC: Una nota arrugada dice: "Lista de compras:Te de manzanilla, Eucalipt, Oso blanco (detergente), Doritos, Iselitas de platano con limon, cable del panel, Oreo. (Lee las mayusculas de izquierda a derecha)"
 
 ---
 SALA: Sala de Estar
