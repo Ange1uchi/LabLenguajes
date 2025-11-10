@@ -76,17 +76,15 @@ gameLoop state = do
             -- Si no se reconoce el comando, muestro mensaje y sigo con el mismo estado
             putStrLn "No entiendo ese comando."
             gameLoop state
-        -- Si el comando es Salir (asumimos que existe ese constructor en Engine.Types),
+        -- Si el comando es Salir,
         -- finalizo el juego mostrando un mensaje de despedida
         Just Salir -> putStrLn "Gracias por jugar."
-        -- Para cualquier otro comando válido, lo proceso y actualizo el estado
         -- Para cualquier otro comando válido, lo proceso y actualizo el estado
         Just cmd -> do
             -- processCommand devuelve un mensaje para mostrar y el nuevo estado del juego
             let (msg, newState) = processCommand cmd state
             putStrLn msg
             
-            -- Asegúrate de que el 'if' y el 'else' estén en la misma columna
             if currentRoom newState == "Salida Final"
                 then putStrLn ("¡Felicidades! Has ganado y escapado de la loca esa \n" ++ "tranquilo mi rey, ya encontraras a alguien... ")
                 else gameLoop newState

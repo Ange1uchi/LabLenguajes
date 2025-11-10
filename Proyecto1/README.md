@@ -81,13 +81,13 @@ Cabe destacar que la narrativa agregada en el Main.hs, funciona con el archivo m
 ### Estructura del Proyecto y Separación de I/O
 El diseño del proyecto se basa en la estricta **separación entre la lógica pura y los efectos de borde (I/O)**.
 
-| Módulo | Responsabilidad | Naturaleza de la Función |
-| :--- | :--- | :--- |
-| **`Engine.Types`** | Definiciones de tipos (`GameState`, `Command`, etc.). | Pura |
-| **`Engine.Parser`** | `parseCommand :: String -> Maybe Command`. Conversión de texto a comando. | [cite_start]Pura  |
-| **`Engine.Core`** | **Corazón de la Lógica:** `processCommand :: Command -> GameState -> (String, GameState)`. Actualiza el estado sin I/O. | **Pura** |
-| **`Engine.Persistence`** | Carga y *parsing* del archivo `mundo.txt`. | Híbrida (I/O y Pura)|
-| **`Main.hs`** | Implementa el `gameLoop`. Único responsable de `getLine` y `putStrLn`. | [cite_start]Impura (I/O)|
+| Módulo                   | Responsabilidad                                                           | Naturaleza de la Función |
+| :---                     | :---                                                                      | :--- |
+| **`Engine.Types`**       | Definiciones de tipos (`GameState`, `Command`, etc.).                     | Pura |
+| **`Engine.Parser`**      | `parseCommand :: String -> Maybe Command`. Conversión de texto a comando. | [cite_start]Pura  |
+| **`Engine.Core`**        | **Corazón de la Lógica:** `processCommand :: Command -> GameState -> (String, GameState)`. Actualiza el estado sin I/O. | Pura |
+| **`Engine.Persistence`** | Carga y *parsing* del archivo `mundo.txt`.                                | Híbrida (I/O y Pura)|
+| **`Main.hs`**            | Implementa el `gameLoop`. Único responsable de `getLine` y `putStrLn`.    | [cite_start]Impura (I/O)|
 
 **Separación I/O:** El `Main.hs` es el único que realiza llamadas impuras (`getLine`, `putStrLn`). El `Engine.Core` (que ejecuta el juego) es completamente puro, lo que hace que la lógica sea fácil de probar, predecible y libre de efectos laterales.
 
@@ -96,7 +96,7 @@ El diseño del proyecto se basa en la estricta **separación entre la lógica pu
 Se eligió el tipo **`Data.Map`** sobre las listas de asociación simples para gestionar las estructuras de juego que requieren búsquedas rápidas por clave.
 
 | Estructura                   | Tipo Elegido        | Ventaja Clave (Rendimiento) |
-| **Mapa del Mundo (`world`)** | `Map RoomName Room` | Permite acceder a cualquier sala del mundo con una eficiencia de **$O(\log n)$**, crucial para transiciones rápidas de sala. |
+| **Mapa del Mundo (`world`)** | `Map RoomName Room` | Permite acceder a cualquier sala del mundo con una eficiencia de **$O(\log n)$**, es importante para transiciones rápidas de sala. |
 | **Salidas de Sala (`exits`)**| `Map Direction RoomName` | Permite verificar si una dirección es válida y obtener la sala de destino en **$O(\log n)$**. |
 | **Inventario (`inventory`)** | `Map ItemName Item` | Permite verificar la pertenencia y obtener los detalles del ítem en **$O(\log n)$**, necesaria para la lógica de `tomar` y `usar`. |
 

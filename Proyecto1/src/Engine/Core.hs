@@ -25,10 +25,10 @@ processCommand (Tomar itemName) state =
                         Nothing -> ("Error: El objeto '" ++ itemName ++ "' existe en la sala, pero no tiene detalles de item.", state)
                         Just itemDetail ->
                             -- Cuando encontramos los detalles, construimos un nuevo estado:
-                            --  - quitamos el item de la lista de la sala con delete
-                            --  - actualizamos el mapa world con la sala modificada (Map.insert)
-                            --  - añadimos el item al inventario (Map.insert)
-                            --  - creamos newState usando record update sobre state
+                            -- quitamos el item de la lista de la sala con delete
+                            -- actualizamos el mapa world con la sala modificada (Map.insert)
+                            -- añadimos el item al inventario (Map.insert)
+                            -- creamos newState usando record update sobre state
                             let
                                 newRoomItems = delete itemName (items currentRoomData)
                                 newRoom = currentRoomData { items = newRoomItems }
@@ -97,7 +97,7 @@ processCommand (Usar itemName) state
             "cable" ->
                 if doorPowered state
                     then ("El panel ya esta activo, el cable no hace mas.", state)
-                    else ("Conectas el cable al hueco en la pared. ¡Click! Se escucha un 'clic' metalico en la distancia, la puerta de salida tiene electricidad.", state { doorPowered = True })
+                    else ("Conectas el cable en el panel de la pared. ¡Click! Se escucha un 'clic' metalico en la distancia, la puerta de salida tiene electricidad.", state { doorPowered = True })
             -- Cualquier otro objeto en esta sala
             _ ->
                 ("No sabes como usar " ++ itemName ++ " en esta sala.", state)
@@ -117,7 +117,7 @@ processCommand (Usar itemName) state
                                     newExitRoom = exitRoom { roomDesc = "La puerta esta desbloqueada y tiene electricidad. ¡Ahora puedes escapar!" , exits = newExits }
                                     newWorld = Map.insert "Cuarto de la Salida" newExitRoom (world state)
                                     newState = state { world = newWorld }
-                                in ("¡Felicidades! La llave maestra encaja y la puerta se abre.\nAhora puedes ir al Norte.", newState)
+                                in ("¡Felicidades! La llave maestra encaja y la puerta se abre.\nPuedes salir por el Norte.", newState)
                     else
                         -- Mensaje de error si no hay energía
                         ("Parece que la puerta necesita electricidad. La llave no gira sin energia.", state)
