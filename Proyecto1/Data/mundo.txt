@@ -3,7 +3,7 @@ DESC: Un cable de red trenzado, parece resistente.
 
 ---
 ITEM: llave_maestra
-DESC: Una antigua llave de bronce. Tiene el numero '5' grabado.
+DESC: Una antigua llave de bronce.
 
 ---
 ITEM: nota
