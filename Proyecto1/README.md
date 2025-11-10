@@ -75,6 +75,9 @@ Este proyecto consiste en el desarrollo de un **motor de aventura de texto** imp
 
 El archivo mundo.txt implementa un pequeño "Escape Room" con un puzle de salida, demostrando la capacidad del motor para manejar salidas condicionales mediante el comando usar teniendo como objetivo desbloquear la puerta del Cuarto de la Salida para llegar a la Salida Final.
 
+## NOTA: 
+Cabe destacar que la narrativa agregada en el Main.hs, funciona con el archivo mundo.txt que se esta anexando en el repositorio del proyecto. si se cambia el mundo.txt (agregando mas objetos) no funcionara a la perfeccion, si se desea que el usuario tenga el poder de agregar salas y objetos, se realizará en una próxima entrega. 
+
 ### Estructura del Proyecto y Separación de I/O
 El diseño del proyecto se basa en la estricta **separación entre la lógica pura y los efectos de borde (I/O)**.
 
@@ -112,10 +115,11 @@ El motor soporta los siguientes comandos en español:
 * `salir`: Termina la ejecución del juego.
 
 
-
 ## Desde WSL se ejecuta de la siguiente forma
 ```bash
 stack build
 stack run
 
 ---
+
+#
