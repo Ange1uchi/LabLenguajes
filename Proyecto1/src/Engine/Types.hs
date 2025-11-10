@@ -36,4 +36,5 @@ data GameState = GameState
     , inventory :: Map.Map ItemName Item
     , world :: Map.Map RoomName Room
     , itemDatabase :: Map.Map ItemName Item 
+    , doorPowered :: Bool
     } deriving (Show)

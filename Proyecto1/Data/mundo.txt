@@ -7,7 +7,7 @@ DESC: Una antigua llave de bronce. Tiene el numero '5' grabado.
 
 ---
 ITEM: nota
-DESC: Una nota arrugada dice: "La solucion esta en la primera cosa que tomaste."
+DESC: Una nota arrugada dice: "Lista de compras:Te de manzanilla, Eucalipt, Oso blanco (detergente), Doritos, Iselitas de platano con limon, cable del panel, Oreo. (Lee las mayusculas desde arriba hacia abajo)"
 
 ---
 SALA: Sala de Estar
@@ -17,14 +17,15 @@ OBJETO: cable
 
 ---
 SALA: Pasillo Central
-DESC: Un pasillo estrecho con puertas al Este y Oeste. La pared Norte tiene un panel de codigos.
+DESC: Un pasillo estrecho con puertas al Este, Norte y Oeste
 SALIDA: Este -> Taller
 SALIDA: Oeste -> Bodega
 SALIDA: Sur -> Sala de Estar
+SALIDA: Norte -> Cuarto de la Salida
 
 ---
 SALA: Taller
-DESC: Este es un taller desordenado lleno de herramientas. Hay un hueco en la pared que parece contener algo.
+DESC: Este es un taller desordenado lleno de herramientas. Hay un panel de control abierto, parece hacer algo
 SALIDA: Oeste -> Pasillo Central
 OBJETO: nota
 
@@ -40,5 +41,5 @@ DESC: ¡Has escapado! Estas en la calle.
 
 ---
 SALA: Cuarto de la Salida
-DESC: Una habitación pequeña con una unica puerta metalica y muy pesada que da al exterior. La puerta tiene una cerradura digital.
+DESC: Una habitación pequeña con una unica puerta metalica y muy pesada en el norte.
 SALIDA: Sur -> Pasillo Central

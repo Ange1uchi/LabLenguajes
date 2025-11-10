@@ -18,13 +18,13 @@ availableCommands :: String
 availableCommands = unlines
     [ "Comandos disponibles:"
     , "  - ir <direccion> (ej: ir norte)"
-    , "  - tomar <objeto> (alias: coger)"
-    , "  - desc <objeto>"
-    , "  - usar <objeto>" 
-    , "  - buscar"
-    , "  - mirar"
-    , "  - inventario (alias: inv)"
-    , "  - salir"
+    , "  - tomar <objeto> (alias: coger) agarrar objeto"
+    , "  - desc <objeto> (ver descripcion del objeto)" 
+    , "  - usar <objeto> (usar objeto)" 
+    , "  - buscar (para buscar en la habitacion)"
+    , "  - mirar (ver objetos y descripcion de la habitacion)"
+    , "  - inventario (alias: inv, para ver tu inventario)"
+    , "  - salir (para salir del juego)"
     ]
 
 -- Punto de entrada del programa
@@ -53,6 +53,7 @@ main = do
                                          , inventory = Map.empty
                                          , world = rooms
                                          , itemDatabase = itemsDB
+                                         , doorPowered = False
                                          }
             putStrLn "Lévantate y escapa si puedes..."
 
@@ -79,9 +80,13 @@ gameLoop state = do
         -- finalizo el juego mostrando un mensaje de despedida
         Just Salir -> putStrLn "Gracias por jugar."
         -- Para cualquier otro comando válido, lo proceso y actualizo el estado
+        -- Para cualquier otro comando válido, lo proceso y actualizo el estado
         Just cmd -> do
             -- processCommand devuelve un mensaje para mostrar y el nuevo estado del juego
             let (msg, newState) = processCommand cmd state
             putStrLn msg
-            -- Continúo el bucle con el estado actualizado
-            gameLoop newState
+            
+            -- Asegúrate de que el 'if' y el 'else' estén en la misma columna
+            if currentRoom newState == "Salida Final"
+                then putStrLn ("¡Felicidades! Has ganado y escapado de la loca esa \n" ++ "tranquilo mi rey, ya encontraras a alguien... ")
+                else gameLoop newState

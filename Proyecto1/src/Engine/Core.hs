@@ -91,23 +91,39 @@ processCommand (Usar itemName) state
     | Map.notMember itemName (inventory state) =
         ("No tienes " ++ itemName ++ " en tu inventario.", state)
 
-    -- Logica del Puzle (Debe ocurrir en Cuarto de la Salida)
+    -- Lógica del Cable: Se usa en el Taller para activar la puerta de salida
+    | currentRoom state == "Taller" =
+        case itemName of
+            "cable" ->
+                if doorPowered state
+                    then ("El panel ya esta activo, el cable no hace mas.", state)
+                    else ("Conectas el cable al hueco en la pared. ¡Click! Se escucha un 'clic' metalico en la distancia, la puerta de salida tiene electricidad.", state { doorPowered = True })
+            -- Cualquier otro objeto en esta sala
+            _ ->
+                ("No sabes como usar " ++ itemName ++ " en esta sala.", state)
+
+    -- Lógica de la Llave Maestra: Se usa en el Cuarto de la Salida
     | currentRoom state == "Cuarto de la Salida" =
         case itemName of
             "llave_maestra" ->
-                -- Si usa la llave maestra en la sala de salida
-                case Map.lookup "Cuarto de la Salida" (world state) of
-                    Nothing -> ("Error interno: Sala de Salida no encontrada.", state)
-                    Just exitRoom ->
-                        -- Define la nueva salida (Salida Final)
-                        let newExits = Map.insert Norte "Salida Final" (exits exitRoom)
-                            newExitRoom = exitRoom { roomDesc = "La puerta esta desbloqueada.", exits = newExits }
-                            newWorld = Map.insert "Cuarto de la Salida" newExitRoom (world state)
-                            newState = state { world = newWorld }
-                        in ("¡Felicidades! La llave maestra encaja en la cerradura y la puerta se abre.\nAhora puedes ir al Norte.", newState)
+                -- Condición: La puerta debe estar activa para que la llave funcione
+                if doorPowered state
+                    then
+                        case Map.lookup "Cuarto de la Salida" (world state) of
+                            Nothing -> ("Error interno: Sala de Salida no encontrada.", state)
+                            Just exitRoom ->
+                                -- Define la nueva salida (Salida Final)
+                                let newExits = Map.insert Norte "Salida Final" (exits exitRoom)
+                                    newExitRoom = exitRoom { roomDesc = "La puerta esta desbloqueada y tiene electricidad. ¡Ahora puedes escapar!" , exits = newExits }
+                                    newWorld = Map.insert "Cuarto de la Salida" newExitRoom (world state)
+                                    newState = state { world = newWorld }
+                                in ("¡Felicidades! La llave maestra encaja y la puerta se abre.\nAhora puedes ir al Norte.", newState)
+                    else
+                        -- Mensaje de error si no hay energía
+                        ("Parece que la puerta necesita electricidad. La llave no gira sin energia.", state)
 
             "cable" ->
-                -- Objeto incorrecto
+                -- Objeto incorrecto en esta sala
                 ("El cable no tiene utilidad aqui.", state)
 
             -- Cualquier otro objeto que no resuelva el puzle
