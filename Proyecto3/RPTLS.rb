@@ -1,6 +1,6 @@
 # RPTLS.rb
 # Lógica del juego Piedra, Papel, Tijera, Lagarto, Spock
-# Proyecto 3 - Laboratorio de Lenguajes de Programación I.
+# para el Proyecto 3 de Laboratorio de Lenguajes de Programación I.
 
 # ============================================================
 # 1. Jerarquía de Jugadas
@@ -72,7 +72,13 @@ class Jugada
     end
   end
 
+  # Devuelve un símbolo (:Piedra, :Papel, etc.) a partir de una jugada
+  def self.simbolo_de(jugada)
+    jugada.tipo
+  end
+
   # Dada la jugada probable del oponente, devuelve una jugada que la derrote.
+  # Puede haber dos opciones que ganen, se escoge una al azar.
   def self.que_gana_a(sim, rng = Random.new)
     objetivo = normalizar_simbolo(sim)
     vencedores = RULES.select { |_k, v| v.include?(objetivo) }.keys
@@ -82,7 +88,6 @@ class Jugada
   end
 end
 
-# Subclases de Jugada (requeridas)
 class Piedra < Jugada
   def initialize
     super(:Piedra)
@@ -125,19 +130,24 @@ class Estrategia
     @@semillaPadre += 1
   end
 
+  # j = jugada previa del oponente (puede ser nil)
   def prox(j = nil)
     raise NotImplementedError, "Debe implementarse en las subclases"
   end
 end
 
 # ------------------------------------------------------------
-# 2.1 Estrategia Manual (CORREGIDO PARA GUI)
+# 2.1 Estrategia Manual
+# En consola pide la jugada por teclado.
+# En GUI (Shoes) se comporta como Uniforme para no colgar la app.
 # ------------------------------------------------------------
 class Manual < Estrategia
-  # Retorna el símbolo especial :EsperandoJugada si está en modo GUI
   def prox(_jugada_anterior_oponente = nil)
+    # Si estamos dentro de Shoes (GUI), NO usar STDIN.gets
     if defined?(Shoes)
-      return :EsperandoJugada
+      # Aviso por consola (sirve para el README también)
+      puts "[AVISO] Estrategia 'Manual' en GUI se juega aleatoria (no hay input por ventana)."
+      return Uniforme.new([:Piedra, :Papel, :Tijera, :Lagarto, :Spock]).prox
     end
 
     # ---- Modo consola real ----
@@ -155,26 +165,30 @@ end
 
 # ------------------------------------------------------------
 # 2.2 Estrategia Uniforme
+# Recibe una lista de movimientos posibles (String o Array)
+# y elige uniformemente entre ESA lista.
 # ------------------------------------------------------------
 class Uniforme < Estrategia
   def initialize(lista_movimientos)
     super()
 
+    # Puede venir como String desde la GUI ("piedra,papel,tijera")
     if lista_movimientos.is_a?(String)
       lista_movimientos = lista_movimientos.split(",")
     end
 
+    # Normalizamos a símbolos válidos y quitamos duplicados
     @movimientos = lista_movimientos.map do |m|
-      begin
-        Jugada.normalizar_simbolo(m)
-      rescue ArgumentError
-        nil # Ignorar jugadas inválidas
-      end
-    end.compact.uniq
+      Jugada.normalizar_simbolo(m)
+    end.uniq
 
+    # Si la lista quedó vacía, usamos TODAS las jugadas
     if @movimientos.empty?
       @movimientos = [:Piedra, :Papel, :Tijera, :Lagarto, :Spock]
     end
+
+    # Para depuración (puedes quitar este puts si quieres)
+    puts "[Uniforme] Movimientos permitidos: #{@movimientos.inspect}"
   end
 
   def prox(_jugada_anterior_oponente = nil)
@@ -185,6 +199,7 @@ end
 
 # ------------------------------------------------------------
 # 2.3 Estrategia Sesgada
+# Recibe un Hash o un string tipo "piedra:2,papel:1"
 # ------------------------------------------------------------
 class Sesgada < Estrategia
   def initialize(pesos)
@@ -202,18 +217,21 @@ class Sesgada < Estrategia
         nombre, peso_str = par.split(":")
         next if nombre.nil? || peso_str.nil?
 
-        begin
-          sim = Jugada.normalizar_simbolo(nombre)
-          @pesos[sim] = peso_str.to_f
-        rescue ArgumentError
-          next
-        end
+        sim = Jugada.normalizar_simbolo(nombre)
+        @pesos[sim] = peso_str.to_f
       end
+    else
+      raise ArgumentError, "Formato de pesos no soportado"
     end
 
+    # Si no se cargó nada o todos pesos son <= 0, usar uniforme
     if @pesos.empty? || @pesos.values.all? { |v| v <= 0 }
       @pesos = {
-        Piedra: 1.0, Papel: 1.0, Tijera: 1.0, Lagarto: 1.0, Spock: 1.0
+        Piedra: 1.0,
+        Papel: 1.0,
+        Tijera: 1.0,
+        Lagarto: 1.0,
+        Spock: 1.0
       }
     end
   end
@@ -230,13 +248,15 @@ class Sesgada < Estrategia
       end
     end
 
-    # Fallback si hay error numérico o pesos son iguales
-    Jugada.desde_simbolo(@pesos.keys.sample(random: @rng))
+    # Por si algún error numérico
+    Jugada.desde_simbolo(@pesos.keys.last)
   end
 end
 
 # ------------------------------------------------------------
-# 2.4 Estrategia Copiar (CORREGIDO: Uso de Uniforme.prox con @rng)
+# 2.4 Estrategia Copiar
+# Primera ronda -> aleatoria
+# Luego -> copia la última jugada del oponente
 # ------------------------------------------------------------
 class Copiar < Estrategia
   def initialize
@@ -246,10 +266,8 @@ class Copiar < Estrategia
 
   def prox(jugada_anterior_oponente = nil)
     # Primera jugada → aleatorio
-    if @primera || jugada_anterior_oponente.nil?
+    if @primera
       @primera = false
-      # Crear una instancia de Uniforme para la primera jugada aleatoria
-      # Nota: Usamos una instancia temporal ya que Uniforme necesita su propio RNG para la muestra.
       return Uniforme.new([:Piedra, :Papel, :Tijera, :Lagarto, :Spock]).prox
     end
 
@@ -261,6 +279,8 @@ end
 
 # ------------------------------------------------------------
 # 2.5 Estrategia Pensar
+# Lleva un historial de jugadas del oponente y elige
+# la jugada que vence a la opción más probable
 # ------------------------------------------------------------
 class Pensar < Estrategia
   def initialize
@@ -289,13 +309,16 @@ class Pensar < Estrategia
 end
 
 # ============================================================
-# 3. Clase Partida (CORREGIDO PARA MANEJAR PAUSA)
+# 3. Clase Partida
 # ============================================================
 
 class Partida
   attr_reader :nombre1, :nombre2, :modo, :objetivo, :ronda_actual,
-              :puntos1, :puntos2, :estrategia1, :estrategia2 # Agregado para depuración
+              :puntos1, :puntos2
 
+  # Constructor flexible:
+  # 1) Partida.new(nombre1, estrategia1, nombre2, estrategia2, modo, objetivo)
+  # 2) Partida.new({ :Jugador1 => estr1, :Jugador2 => estr2 })  # modo y objetivo por defecto
   def initialize(*args)
     if args.size == 1 && args[0].is_a?(Hash)
       config = args[0]
@@ -326,45 +349,43 @@ class Partida
     @ultima_jugada_j2 = nil
   end
 
+  # Devuelve true si la partida ya terminó
   def terminado?
     @terminado
   end
 
-  # Juega UNA ronda o pausa si un jugador es manual.
-  # jugada_manual es la instancia de Jugada del jugador que reanuda la partida.
-  def siguiente_ronda(jugada_manual = nil)
+  # Juega UNA ronda y devuelve un Hash con la info, para ser usado por main.rb
+  #
+  # {
+  #   j1: "Piedra",
+  #   j2: "Papel",
+  #   p1: puntos_totales_j1,
+  #   p2: puntos_totales_j2,
+  #   delta1: puntos_obtenidos_esta_ronda_por_j1,
+  #   delta2: puntos_obtenidos_esta_ronda_por_j2,
+  #   ronda: numero_de_ronda,
+  #   terminado: bool,
+  #   ganador: nombre_o_nil
+  # }
+  def siguiente_ronda
     if @terminado
       return {
-        j1: @ultima_jugada_j1&.to_s, j2: @ultima_jugada_j2&.to_s,
-        p1: @puntos1, p2: @puntos2,
-        delta1: 0, delta2: 0, ronda: @ronda_actual,
-        terminado: true, ganador: ganador_final
+        j1: @ultima_jugada_j1&.to_s,
+        j2: @ultima_jugada_j2&.to_s,
+        p1: @puntos1,
+        p2: @puntos2,
+        delta1: 0,
+        delta2: 0,
+        ronda: @ronda_actual,
+        terminado: true,
+        ganador: ganador_final
       }
     end
 
-    # 1. Obtener jugadas: Juega o Pausa
-    if jugada_manual
-      # Caso de reanudación: J1 jugó manualmente.
-      # NOTA: Simplificamos asumiendo que Partida solo se reanuda después de que J1 pausó.
-      # La lógica de J2 pausando y reanudando es más compleja y excede la simplicidad del flujo GUI.
-      jug1 = jugada_manual
-      jug2 = @estrategia2.prox(@ultima_jugada_j1)
-    else
-      # Llamar prox() para J1
-      jug1 = @estrategia1.prox(@ultima_jugada_j2)
-      if jug1 == :EsperandoJugada
-        return { pausada: @nombre1 }
-      end
-
-      # Llamar prox() para J2
-      jug2 = @estrategia2.prox(@ultima_jugada_j1)
-      if jug2 == :EsperandoJugada
-        return { pausada: @nombre2 }
-      end
-    end
-
-    # Si llegamos aquí, ambas jugadas (jug1 y jug2) son instancias de Jugada.
     @ronda_actual += 1
+
+    jug1 = @estrategia1.prox(@ultima_jugada_j2)
+    jug2 = @estrategia2.prox(@ultima_jugada_j1)
 
     @ultima_jugada_j1 = jug1
     @ultima_jugada_j2 = jug2
@@ -373,19 +394,27 @@ class Partida
     @puntos1 += delta1
     @puntos2 += delta2
 
-    # ---------- Lógica de terminación de partida ----------
+    # ---------- AQUÍ ESTÁ LA DIFERENCIA DE MODOS ----------
     case @modo
     when :rondas
+      # Se juegan EXACTAMENTE N rondas, sin importar el puntaje
       @terminado = true if @ronda_actual >= @objetivo
     when :alcanzar
+      # Se juega hasta que alguien llegue a N puntos
       @terminado = true if @puntos1 >= @objetivo || @puntos2 >= @objetivo
+    else
+      # fallback por si acaso
+      @terminado = true if @ronda_actual >= @objetivo
     end
     # ------------------------------------------------------
 
     {
-      j1: jug1.to_s, j2: jug2.to_s,
-      p1: @puntos1, p2: @puntos2,
-      delta1: delta1, delta2: delta2,
+      j1: jug1.to_s,
+      j2: jug2.to_s,
+      p1: @puntos1,
+      p2: @puntos2,
+      delta1: delta1,
+      delta2: delta2,
       ronda: @ronda_actual,
       terminado: @terminado,
       ganador: (@terminado ? ganador_final : nil)
