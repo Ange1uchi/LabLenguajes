@@ -218,8 +218,20 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           background white
           border black
           caption "Ronda #{ronda}"
-          para "#{@partida.nombre1} juega: #{jug1}"
-          para "#{@partida.nombre2} juega: #{jug2}"
+          flow do
+            stack width: 0.5, align: "center" do
+              para "#{@partida.nombre1} juega:"
+              # 🔑 CLAVE: Usamos 'img/' para la ruta relativa
+              image "img/#{jug1}.png", width: 100, height: 100
+              para jug1
+            end
+            stack width: 0.5, align: "center" do
+              para "#{@partida.nombre2} juega:"
+              # 🔑 CLAVE: Usamos 'img/' para la ruta relativa
+              image "img/#{jug2}.png", width: 100, height: 100
+              para jug2
+            end
+          end
           para "Puntos de la ronda: #{@partida.nombre1} +#{d1}, #{@partida.nombre2} +#{d2}"
         end
 
