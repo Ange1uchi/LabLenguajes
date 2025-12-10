@@ -174,12 +174,18 @@ class Uniforme < Estrategia
 
     # Puede venir como String desde la GUI ("piedra,papel,tijera")
     if lista_movimientos.is_a?(String)
-      lista_movimientos = lista_movimientos.split(",")
+      # 🔑 CLAVE: Limpiar y quitar elementos vacíos después del split
+      lista_movimientos = lista_movimientos.split(",").map(&:strip).reject(&:empty?)
     end
 
     # Normalizamos a símbolos válidos y quitamos duplicados
-    @movimientos = lista_movimientos.map do |m|
-      Jugada.normalizar_simbolo(m)
+    # Usamos .filter_map para omitir cualquier entrada que lance ArgumentError
+    @movimientos = lista_movimientos.filter_map do |m|
+      begin
+        Jugada.normalizar_simbolo(m)
+      rescue ArgumentError
+        nil # Si el nombre es inválido (ej: 'banana'), lo ignoramos
+      end
     end.uniq
 
     # Si la lista quedó vacía, usamos TODAS las jugadas
