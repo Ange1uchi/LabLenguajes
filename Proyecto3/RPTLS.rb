@@ -1,6 +1,7 @@
 # RPTLS.rb
-# Lógica del juego Piedra, Papel, Tijera, Lagarto, Spock
-# para el Proyecto 3 de Laboratorio de Lenguajes de Programación I.
+# Implementación de Piedra, Papel, Tijera, Lagarto, Spock
+# Comentarios escritos en estilo de estudiante de ingeniería en computación:
+# explicaciones breves y claras sobre propósito y funcionamiento.
 
 # ============================================================
 # 1. Jerarquía de Jugadas
@@ -9,8 +10,8 @@
 class Jugada
   attr_reader :tipo
 
-  # Mapa de qué le gana a qué:
-  # CLAVE = jugada, VALOR = arreglo de jugadas a las que vence
+  # Mapa de qué vence a qué. Las claves son símbolos que representan
+  # cada jugada y los valores son arreglos con las jugadas vencidas.
   RULES = {
     Piedra:  [:Tijera, :Lagarto],
     Papel:   [:Piedra, :Spock],
@@ -19,6 +20,7 @@ class Jugada
     Spock:   [:Piedra, :Tijera]
   }
 
+  # Inicializa una jugada a partir de un tipo (string o símbolo).
   def initialize(tipo)
     @tipo = tipo.to_sym
   end
@@ -27,7 +29,8 @@ class Jugada
     @tipo.to_s
   end
 
-  # puntos(contrincante) -> [ptos_propios, ptos_contrincante]
+  # Calcula los puntos de esta jugada contra otra jugada.
+  # Devuelve un par [puntos_propios, puntos_contrincante].
   def puntos(contrincante)
     tipo_contra = contrincante.tipo
 
@@ -42,7 +45,7 @@ class Jugada
     end
   end
 
-  # Fábrica de jugadas desde un símbolo o string
+  # Crea una instancia de Jugada a partir de un símbolo o string.
   def self.desde_simbolo(sim)
     s = normalizar_simbolo(sim)
     case s
@@ -56,7 +59,7 @@ class Jugada
     end
   end
 
-  # Normaliza cosas como "piedra", :piedra, "PIEDRA" -> :Piedra
+  # Convierte entradas como "piedra", :piedra, "PIEDRA" -> :Piedra
   def self.normalizar_simbolo(sim)
     return sim if sim.is_a?(Symbol) && RULES.key?(sim)
 
@@ -72,13 +75,13 @@ class Jugada
     end
   end
 
-  # Devuelve un símbolo (:Piedra, :Papel, etc.) a partir de una jugada
+  # Devuelve el símbolo asociado a una instancia de Jugada.
   def self.simbolo_de(jugada)
     jugada.tipo
   end
 
-  # Dada la jugada probable del oponente, devuelve una jugada que la derrote.
-  # Puede haber dos opciones que ganen, se escoge una al azar.
+  # Dada una jugada objetivo, devuelve una jugada que la derrote.
+  # Si hay dos opciones, elige una aleatoriamente usando rng.
   def self.que_gana_a(sim, rng = Random.new)
     objetivo = normalizar_simbolo(sim)
     vencedores = RULES.select { |_k, v| v.include?(objetivo) }.keys
@@ -88,6 +91,7 @@ class Jugada
   end
 end
 
+# Clases concretas que representan cada tipo de jugada.
 class Piedra < Jugada
   def initialize
     super(:Piedra)
@@ -123,6 +127,7 @@ end
 # ============================================================
 
 class Estrategia
+  # Semilla compartida para crear RNG reproducible entre instancias.
   @@semillaPadre = 42
 
   def initialize
@@ -130,27 +135,23 @@ class Estrategia
     @@semillaPadre += 1
   end
 
-  # j = jugada previa del oponente (puede ser nil)
+  # Método abstracto: debe retornar una Jugada. Puede recibir la jugada
+  # previa del oponente (o nil si no hay).
   def prox(j = nil)
     raise NotImplementedError, "Debe implementarse en las subclases"
   end
 end
 
-# ------------------------------------------------------------
-# 2.1 Estrategia Manual
-# En consola pide la jugada por teclado.
-# En GUI (Shoes) se comporta como Uniforme para no colgar la app.
-# ------------------------------------------------------------
+# Estrategia Manual:
+# - En consola pide entrada al usuario.
+# - En GUI (Shoes) evita bloquear y elige aleatoriamente.
 class Manual < Estrategia
   def prox(_jugada_anterior_oponente = nil)
-    # Si estamos dentro de Shoes (GUI), NO usar STDIN.gets
     if defined?(Shoes)
-      # Aviso por consola (sirve para el README también)
       puts "[AVISO] Estrategia 'Manual' en GUI se juega aleatoria (no hay input por ventana)."
       return Uniforme.new([:Piedra, :Papel, :Tijera, :Lagarto, :Spock]).prox
     end
 
-    # ---- Modo consola real ----
     loop do
       puts "Elige jugada (piedra, papel, tijera, lagarto, spock): "
       entrada = STDIN.gets&.chomp
@@ -163,37 +164,32 @@ class Manual < Estrategia
   end
 end
 
-# ------------------------------------------------------------
-# 2.2 Estrategia Uniforme
-# Recibe una lista de movimientos posibles (String o Array)
-# y elige uniformemente entre ESA lista.
-# ------------------------------------------------------------
+# Estrategia Uniforme:
+# - Recibe una lista (o string) de movimientos permitidos.
+# - Elige uniformemente entre ellos.
 class Uniforme < Estrategia
   def initialize(lista_movimientos)
     super()
 
-    # Puede venir como String desde la GUI ("piedra,papel,tijera")
+    # Acepta string tipo "piedra,papel" y lo convierte en array limpio.
     if lista_movimientos.is_a?(String)
-      # 🔑 CLAVE: Limpiar y quitar elementos vacíos después del split
       lista_movimientos = lista_movimientos.split(",").map(&:strip).reject(&:empty?)
     end
 
-    # Normalizamos a símbolos válidos y quitamos duplicados
-    # Usamos .filter_map para omitir cualquier entrada que lance ArgumentError
+    # Normaliza entradas a símbolos válidos y elimina duplicados.
     @movimientos = lista_movimientos.filter_map do |m|
       begin
         Jugada.normalizar_simbolo(m)
       rescue ArgumentError
-        nil # Si el nombre es inválido (ej: 'banana'), lo ignoramos
+        nil
       end
     end.uniq
 
-    # Si la lista quedó vacía, usamos TODAS las jugadas
+    # Si no quedó nada válido, usar todas las jugadas por defecto.
     if @movimientos.empty?
       @movimientos = [:Piedra, :Papel, :Tijera, :Lagarto, :Spock]
     end
 
-    # Para depuración (puedes quitar este puts si quieres)
     puts "[Uniforme] Movimientos permitidos: #{@movimientos.inspect}"
   end
 
@@ -203,10 +199,9 @@ class Uniforme < Estrategia
   end
 end
 
-# ------------------------------------------------------------
-# 2.3 Estrategia Sesgada
-# Recibe un Hash o un string tipo "piedra:2,papel:1"
-# ------------------------------------------------------------
+# Estrategia Sesgada:
+# - Recibe pesos por jugada (hash o string "piedra:2,papel:1").
+# - Selecciona según distribución discreta definida por los pesos.
 class Sesgada < Estrategia
   def initialize(pesos)
     super()
@@ -218,7 +213,6 @@ class Sesgada < Estrategia
         @pesos[sim] = v.to_f
       end
     elsif pesos.is_a?(String)
-      # Formato esperado: "piedra:2,papel:1,spock:3"
       pesos.split(",").each do |par|
         nombre, peso_str = par.split(":")
         next if nombre.nil? || peso_str.nil?
@@ -230,7 +224,7 @@ class Sesgada < Estrategia
       raise ArgumentError, "Formato de pesos no soportado"
     end
 
-    # Si no se cargó nada o todos pesos son <= 0, usar uniforme
+    # Si no hay pesos válidos, usar distribución uniforme por defecto.
     if @pesos.empty? || @pesos.values.all? { |v| v <= 0 }
       @pesos = {
         Piedra: 1.0,
@@ -254,16 +248,14 @@ class Sesgada < Estrategia
       end
     end
 
-    # Por si algún error numérico
+    # Fallback si hay error numérico: devolver la última clave.
     Jugada.desde_simbolo(@pesos.keys.last)
   end
 end
 
-# ------------------------------------------------------------
-# 2.4 Estrategia Copiar
-# Primera ronda -> aleatoria
-# Luego -> copia la última jugada del oponente
-# ------------------------------------------------------------
+# Estrategia Copiar:
+# - Primera ronda elige aleatorio.
+# - Luego copia la última jugada del oponente.
 class Copiar < Estrategia
   def initialize
     super()
@@ -271,45 +263,40 @@ class Copiar < Estrategia
   end
 
   def prox(jugada_anterior_oponente = nil)
-    # Primera jugada → aleatorio
     if @primera
       @primera = false
       return Uniforme.new([:Piedra, :Papel, :Tijera, :Lagarto, :Spock]).prox
     end
 
-    # Rondas siguientes → copiar jugada del rival
     return Jugada.desde_simbolo(jugada_anterior_oponente.tipo)
   end
 end
 
-
-# ------------------------------------------------------------
-# 2.5 Estrategia Pensar
-# Lleva un historial de jugadas del oponente y elige
-# la jugada que vence a la opción más probable
-# ------------------------------------------------------------
+# Estrategia Pensar:
+# - Mantiene un historial de la frecuencia de jugadas del oponente.
+# - Elige la jugada que vence a la más frecuente.
 class Pensar < Estrategia
   def initialize
     super()
-    @historial = Hash.new(0) # { :Piedra => frecuencia, ... }
+    @historial = Hash.new(0)
   end
 
   def prox(jugada_anterior_oponente = nil)
-    # Actualizamos historial con la jugada previa del oponente
+    # Actualizamos historial con la última jugada del oponente si existe.
     if jugada_anterior_oponente
       sim = jugada_anterior_oponente.tipo
       @historial[sim] += 1
     end
 
-    # Si aún no tenemos datos, jugamos uniforme
+    # Si no hay datos, jugar uniforme.
     if @historial.empty?
       return Uniforme.new([:Piedra, :Papel, :Tijera, :Lagarto, :Spock]).prox
     end
 
-    # Buscamos la jugada más frecuente del oponente
+    # Determinar la jugada más frecuente del rival.
     mas_probable, _freq = @historial.max_by { |_k, v| v }
 
-    # Elegimos una jugada que le gane a la más probable
+    # Escoger una jugada que le gane a la más probable.
     Jugada.que_gana_a(mas_probable, @rng)
   end
 end
@@ -323,8 +310,8 @@ class Partida
               :puntos1, :puntos2
 
   # Constructor flexible:
-  # 1) Partida.new(nombre1, estrategia1, nombre2, estrategia2, modo, objetivo)
-  # 2) Partida.new({ :Jugador1 => estr1, :Jugador2 => estr2 })  # modo y objetivo por defecto
+  # - Puede recibir un hash { :Jugador1 => estr1, :Jugador2 => estr2 }
+  # - O recibir los 6 parámetros: nombre1, estr1, nombre2, estr2, modo, objetivo
   def initialize(*args)
     if args.size == 1 && args[0].is_a?(Hash)
       config = args[0]
@@ -355,24 +342,13 @@ class Partida
     @ultima_jugada_j2 = nil
   end
 
-  # Devuelve true si la partida ya terminó
+  # Indica si la partida terminó.
   def terminado?
     @terminado
   end
 
-  # Juega UNA ronda y devuelve un Hash con la info, para ser usado por main.rb
-  #
-  # {
-  #   j1: "Piedra",
-  #   j2: "Papel",
-  #   p1: puntos_totales_j1,
-  #   p2: puntos_totales_j2,
-  #   delta1: puntos_obtenidos_esta_ronda_por_j1,
-  #   delta2: puntos_obtenidos_esta_ronda_por_j2,
-  #   ronda: numero_de_ronda,
-  #   terminado: bool,
-  #   ganador: nombre_o_nil
-  # }
+  # Juega una ronda y devuelve un hash con información del resultado.
+  # Actualiza puntajes y estado interno.
   def siguiente_ronda
     if @terminado
       return {
@@ -400,19 +376,17 @@ class Partida
     @puntos1 += delta1
     @puntos2 += delta2
 
-    # ---------- AQUÍ ESTÁ LA DIFERENCIA DE MODOS ----------
+    # Modo de terminación:
+    # - :rondas -> jugar exactamente N rondas.
+    # - :alcanzar -> jugar hasta que alguien alcance N puntos.
     case @modo
     when :rondas
-      # Se juegan EXACTAMENTE N rondas, sin importar el puntaje
       @terminado = true if @ronda_actual >= @objetivo
     when :alcanzar
-      # Se juega hasta que alguien llegue a N puntos
       @terminado = true if @puntos1 >= @objetivo || @puntos2 >= @objetivo
     else
-      # fallback por si acaso
       @terminado = true if @ronda_actual >= @objetivo
     end
-    # ------------------------------------------------------
 
     {
       j1: jug1.to_s,
@@ -429,6 +403,7 @@ class Partida
 
   private
 
+  # Determina el ganador final por puntaje o nil si empate.
   def ganador_final
     if @puntos1 > @puntos2
       @nombre1

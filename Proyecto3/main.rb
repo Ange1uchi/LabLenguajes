@@ -1,6 +1,5 @@
-# main.rb
-# Proyecto 3 - Laboratorio de Lenguajes de Programación I
-# Piedra, Papel, Tijera, Lagarto, Spock con interfaz gráfica usando Shoes 4
+# main.rb - Proyecto 3: Piedra, Papel, Tijera, Lagarto, Spock con GUI usando Shoes 4
+# Comentarios escritos como estudiante de Ingeniería en Computación
 
 require 'shoes'
 require_relative 'RPTLS'
@@ -25,13 +24,13 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
   @stack_jugadas = nil
   @msg_final     = nil
 
-  # ---------------- Encabezado ----------------
+  # Encabezado: título y descripción del proyecto
   stack margin: 10 do
     caption "Piedra, Papel, Tijera, Lagarto, Spock"
     para "Proyecto 3 – Ruby – Interfaz gráfica con Shoes"
   end
 
-  # ---------------- Configuración ----------------
+  # Configuración de jugadores: inputs para nombres, estrategias y parámetros
   stack margin: 10 do
     subtitle "Configuración de jugadores"
 
@@ -92,7 +91,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
     flow margin_top: 10 do
       button "Iniciar partida" do
         begin
-          # -------- leer nombres de forma segura --------
+          # Leer nombres de los edit_lines de forma segura
           nombre1 = if @nombre_j1 && @nombre_j1.respond_to?(:text)
                       @nombre_j1.text.to_s.strip
                     else
@@ -107,7 +106,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           nombre1 = "Jugador 1" if nombre1.empty?
           nombre2 = "Jugador 2" if nombre2.empty?
 
-          # -------- leer estrategias --------
+          # Leer estrategias seleccionadas
           estrategia_nombre_1 = if @estrategia_j1 && @estrategia_j1.respond_to?(:text)
                                   @estrategia_j1.text.to_s
                                 else
@@ -120,7 +119,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
                                   "Uniforme"
                                 end
 
-          # -------- leer parámetros --------
+          # Leer parámetros opcionales
           params1 = if @params_j1 && @params_j1.respond_to?(:text)
                       @params_j1.text.to_s.strip
                     else
@@ -133,7 +132,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
                       ""
                     end
 
-          # -------- modo de juego --------
+          # Determinar modo de juego elegido
           modo_texto = if @modo_list && @modo_list.respond_to?(:text)
                          @modo_list.text.to_s
                        else
@@ -142,7 +141,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
 
           modo = (modo_texto == "Rondas (N fijas)") ? :rondas : :alcanzar
 
-          # -------- N --------
+          # Parsear N con fallback a 5 (validar entero y positivo)
           n_str = if @input_n && @input_n.respond_to?(:text)
                     @input_n.text.to_s
                   else
@@ -159,9 +158,11 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
             end
           end
 
+          # Construir objetos de estrategia según selección
           estrategia1 = construir_estrategia(estrategia_nombre_1, params1)
           estrategia2 = construir_estrategia(estrategia_nombre_2, params2)
 
+          # Crear la partida con los datos leídos
           @partida = Partida.new(nombre1, estrategia1, nombre2, estrategia2,
                                  modo, n_int)
 
@@ -169,12 +170,14 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           actualizar_puntaje("Puntaje: #{nombre1} 0 - 0 #{nombre2}")
           actualizar_msg_final("")
 
+          # Limpiar zona de jugadas y mostrar mensaje inicial
           @stack_jugadas.clear do
             background white
             border black
             para "Haz clic en 'Siguiente ronda' para jugar."
           end
         rescue => e
+          # Si algo falla, imprimo en consola y actualizo estado en la GUI
           puts "ERROR al iniciar partida: #{e.class} - #{e.message}"
           puts e.backtrace
           actualizar_estado("Error al iniciar (revisa consola).")
@@ -185,7 +188,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
     end
   end
 
-  # ---------------- Sección de juego ----------------
+  # Sección de juego: mostrar puntajes, jugadas y controles
   stack margin: 10 do
     subtitle "Desarrollo de la partida"
 
@@ -204,6 +207,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           next
         end
 
+        # Ejecutar la siguiente ronda y obtener resultado
         resultado = @partida.siguiente_ronda
 
         jug1  = resultado[:j1]
@@ -214,6 +218,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
         d2    = resultado[:delta2]
         ronda = resultado[:ronda]
 
+        # Mostrar imágenes y textos de la ronda actual
         @stack_jugadas.clear do
           background white
           border black
@@ -221,13 +226,13 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           flow do
             stack width: 0.5, align: "center" do
               para "#{@partida.nombre1} juega:"
-              # 🔑 CLAVE: Usamos 'img/' para la ruta relativa
+              # Nota: las imágenes están en la carpeta relativa 'img/'
               image "img/#{jug1}.png", width: 100, height: 100
               para jug1
             end
             stack width: 0.5, align: "center" do
               para "#{@partida.nombre2} juega:"
-              # 🔑 CLAVE: Usamos 'img/' para la ruta relativa
+              # Nota: las imágenes están en la carpeta relativa 'img/'
               image "img/#{jug2}.png", width: 100, height: 100
               para jug2
             end
@@ -239,6 +244,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
           "Puntaje: #{@partida.nombre1} #{p1} - #{p2} #{@partida.nombre2}"
         )
 
+        # Si la partida terminó, deshabilitar siguiente y mostrar ganador/empate
         if resultado[:terminado]
           @btn_siguiente.style(state: "disabled") rescue nil
           ganador = resultado[:ganador]
@@ -254,6 +260,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
       end
 
       button "Reiniciar" do
+        # Reset básico de la interfaz
         @partida = nil
         actualizar_estado("Esperando configuración...")
         actualizar_puntaje("Puntaje: -")
@@ -270,7 +277,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
     @msg_final = para ""
   end
 
-  # ---------------- Métodos auxiliares ----------------
+  # Métodos auxiliares para actualizar la GUI y construir estrategias
   def actualizar_estado(texto)
     if @lbl_estado && @lbl_estado.respond_to?(:text=)
       @lbl_estado.text = texto
@@ -289,12 +296,13 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
     end
   end
 
+  # Mapear nombre de estrategia a su clase correspondiente (se asume RPTLS.rb define estas clases)
   def construir_estrategia(nombre_estrategia, params_str)
     case nombre_estrategia
     when "Manual"
       Manual.new
     when "Uniforme"
-      # Le pasamos el string directamente ("piedra,papel,tijera")
+      # Paso el string tal cual; la clase Uniforme se encarga de parsearlo
       Uniforme.new(params_str.to_s)
     when "Sesgada"
       Sesgada.new(params_str.to_s)
@@ -303,7 +311,7 @@ Shoes.app(title: "Piedra, Papel, Tijera, Lagarto, Spock", width: 700, height: 60
     when "Pensar"
       Pensar.new
     else
-      Uniforme.new("") # por defecto, todas las jugadas
+      Uniforme.new("") # fallback: estrategia uniforme por defecto
     end
   end
 
